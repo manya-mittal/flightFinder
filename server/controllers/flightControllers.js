@@ -9,17 +9,39 @@ var amadeus = new Amadeus({
 
 
 const getFlights = (req,res) => {
-    const {route, travelTime, stops, price} = req.body
+    const {to, from, depart, returning, passengers} = req.body
 
-    // Find the cheapest flights from SYD to BKK
+    console.log(req.body);
+
+    // Find the cheapest flights 
     amadeus.shopping.flightOffersSearch.get({
-        originLocationCode: 'YYZ',
-        destinationLocationCode: 'KUL',
-        departureDate: '2022-08-01',
-        adults: '2'
+        originLocationCode: from,
+        destinationLocationCode: to,
+        departureDate: depart,
+        adults: passengers
     }).then(function (response) {
-        res.send(response);
-        // console.log(response);
+
+
+        // converts the first flight's route into an array of json objects
+        const route = []
+        for (let i = 0; i < response.data[0].itineraries[0].segments.length; i++) {
+            const from = response.data[0].itineraries[0].segments[i].departure.iataCode
+            const to = response.data[0].itineraries[0].segments[i].arrival.iataCode
+            route[i] = {from, to}
+        }
+
+        const duration = response.data[0].itineraries[0].duration.substring(2)
+
+        const stops = route.length - 1
+
+        const price = response.data[0].price.grandTotal
+        
+        flights = [{route, duration, stops, price}]
+        console.log(flights);
+        
+        res.send(flights)
+        // res.send(response);
+        
     }).catch(function (response) {
         console.error(response);
     });
