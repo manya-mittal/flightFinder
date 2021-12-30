@@ -22,24 +22,31 @@ const getFlights = (req,res) => {
     }).then(function (response) {
 
 
-        // converts the first flight's route into an array of json objects
-        const route = []
-        for (let i = 0; i < response.data[0].itineraries[0].segments.length; i++) {
-            const from = response.data[0].itineraries[0].segments[i].departure.iataCode
-            const to = response.data[0].itineraries[0].segments[i].arrival.iataCode
-            route[i] = {from, to}
-        }
+        const flights = []
 
-        const duration = response.data[0].itineraries[0].duration.substring(2)
+        for (let j = 0; j < 20; j++) {
+                // converts the first flight's route into an array of json objects
+            const route = []
+            for (let i = 0; i < response.data[j].itineraries[0].segments.length; i++) {
+                const from = response.data[j].itineraries[0].segments[i].departure.iataCode
+                const to = response.data[j].itineraries[0].segments[i].arrival.iataCode
+                route[i] = {from, to}
+            }
 
-        const stops = route.length - 1
+            const duration = response.data[j].itineraries[0].duration.substring(2)
 
-        const price = response.data[0].price.grandTotal
+            const stops = route.length - 1
+
+            const price = response.data[j].price.grandTotal
         
-        flights = [{route, duration, stops, price}]
+            flights[j] = {route, duration, stops, price}
+            console.log(flights[j]);
+        }
         console.log(flights);
         
-        res.send(flights)
+        
+        
+        res.send(flights);
         // res.send(response);
         
     }).catch(function (response) {
